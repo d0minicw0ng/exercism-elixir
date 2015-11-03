@@ -31,12 +31,22 @@ defmodule Roman do
     num * ten_to_the_power(exponent)
   end
 
-  defp ten_to_the_power(exponent), do: :math.pow(10, exponent)
+  defp ten_to_the_power(exponent), do: :math.pow(10, exponent) |> round
 
-  # TODO: not sure what to name it yet
-  defp special_case(num) do
+  # TODO: not sure what to name these methods yet...
+  defp case_one(num) do
     divisor = get_divisor(num)
     String.duplicate(table[divisor], div(num, divisor)) <> to_roman(rem(num, divisor))
+  end
+
+  defp case_two(num, exponent) do
+    base = 5 * ten_to_the_power(exponent)
+    table[base] <> to_roman(rem(num, base))
+  end
+
+  defp case_three(num, exponent) do
+    base = ten_to_the_power(exponent)
+    table[base] <> table[base * 10] <> to_roman(num - base * 9)
   end
 
   defp get_divisor(num) do
@@ -55,39 +65,28 @@ defmodule Roman do
     }
   end
 
-  defp to_roman(num) when num <= 3, do: String.duplicate(table[1], num)
+  defp dup(char, num), do: String.duplicate(char, num)
 
+  defp to_roman(num) when num <= 3, do: dup(table[1], num)
   defp to_roman(num) when num == 4, do: table[1] <> table[5]
-
   defp to_roman(num) when num <= 8, do: table[5] <> to_roman(num - 5)
-
   defp to_roman(num) when num == 9, do: table[1] <> table[10]
 
   defp to_roman(num) when num <= 49 do
-    special_case(num) |> String.replace("XXXX", table[10] <> table[50])
+    case_one(num) |> String.replace(dup(table[10], 4), table[10] <> table[50])
   end
 
-  defp to_roman(num) when num <= 89 do
-    table[50] <> to_roman(num - 50)
-  end
+  defp to_roman(num) when num <= 89, do: case_two(num, 1)
 
-  defp to_roman(num) when num <= 99 do
-    table[10] <> table[100] <> to_roman(num - 90)
-  end
+  defp to_roman(num) when num <= 99, do: case_three(num, 1)
 
   defp to_roman(num) when num <= 499 do
-    special_case(num) |> String.replace("CCCC", table[100] <> table[500])
+    case_one(num) |> String.replace(dup(table[100], 4), table[100] <> table[500])
   end
 
-  defp to_roman(num) when num <= 899 do
-    table[500] <> to_roman(rem(num, 100))
-  end
+  defp to_roman(num) when num <= 899, do: case_two(num, 2)
 
-  defp to_roman(num) when num <= 999 do
-    table[100] <> table[1000] <> to_roman(num - 900)
-  end
+  defp to_roman(num) when num <= 999, do: case_three(num, 2)
 
-  defp to_roman(num) when num <= 4999 do
-    special_case(num)
-  end
+  defp to_roman(num) when num <= 4999, do: case_one(num)
 end
