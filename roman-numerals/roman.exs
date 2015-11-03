@@ -8,9 +8,9 @@ defmodule Roman do
   end
 
   defp split(str) do
-    arr = String.split(str, "")
-    Enum.slice(arr, 0..(length(arr) - 2)) |>
-    Enum.map(fn(int) -> String.to_integer(int) end)
+    String.split(str, "") |>
+    Stream.filter(&(Regex.match?(~r/\d+/, &1))) |>
+    Enum.map(&String.to_integer/1)
   end
 
   defp get_roman_numerals(num_arr) do
@@ -22,7 +22,7 @@ defmodule Roman do
   end
 
   defp get_roman_representation({num, idx}, arr_length) do
-    (arr_length - idx - 1) |> times_ten_to_the_power(num) |> round |> to_roman
+    (arr_length - idx - 1) |> times_ten_to_the_power(num) |> to_roman
   end
 
   defp times_ten_to_the_power(exponent, num) when exponent == 0, do: num
@@ -30,29 +30,28 @@ defmodule Roman do
 
   defp ten_to_the_power(exponent), do: :math.pow(10, exponent) |> round
 
-  # TODO: not sure what to name these methods yet...
+  # TODO: not sure what to name the three cases yet...
   defp case_one(num) do
-    divisor = get_divisor(num)
-    String.duplicate(table[divisor], div(num, divisor)) <> to_roman(rem(num, divisor)) |>
-    replace_four_occurrences(divisor)
+    base = get_base(num)
+    String.duplicate(table[base], div(num, base)) <> to_roman(rem(num, base)) |>
+    replace_four_occurrences(base)
   end
 
-  defp replace_four_occurrences(str, divisor) do
-    String.replace(str, dup(table[divisor], 4), table[divisor] <> table[divisor * 5])
+  defp replace_four_occurrences(str, base) do
+    String.replace(str, dup(table[base], 4), table[base] <> table[base * 5])
   end
-
 
   defp case_two(num) do
-    base = 5 * get_divisor(num)
+    base = 5 * get_base(num)
     table[base] <> to_roman(rem(num, base))
   end
 
   defp case_three(num) do
-    base = get_divisor(num)
-    table[base] <> table[base * 10] <> to_roman(num - base * 9)
+    base = get_base(num)
+    table[base] <> table[base * 10] <> to_roman(rem(num, base * 9))
   end
 
-  defp get_divisor(num) do
+  defp get_base(num) do
     :math.log10(num) |> Float.floor |> ten_to_the_power |> round
   end
 
