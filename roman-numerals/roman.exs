@@ -36,8 +36,14 @@ defmodule Roman do
   # TODO: not sure what to name these methods yet...
   defp case_one(num) do
     divisor = get_divisor(num)
-    String.duplicate(table[divisor], div(num, divisor)) <> to_roman(rem(num, divisor))
+    String.duplicate(table[divisor], div(num, divisor)) <> to_roman(rem(num, divisor)) |>
+    replace_four_occurrences(divisor)
   end
+
+  defp replace_four_occurrences(str, divisor) do
+    String.replace(str, dup(table[divisor], 4), table[divisor] <> table[divisor * 5])
+  end
+
 
   defp case_two(num, exponent) do
     base = 5 * ten_to_the_power(exponent)
@@ -61,7 +67,8 @@ defmodule Roman do
       50   => "L",
       100  => "C",
       500  => "D",
-      1000 => "M"
+      1000 => "M",
+      5000 => "V"
     }
   end
 
@@ -72,20 +79,12 @@ defmodule Roman do
   defp to_roman(num) when num <= 8, do: table[5] <> to_roman(num - 5)
   defp to_roman(num) when num == 9, do: table[1] <> table[10]
 
-  defp to_roman(num) when num <= 49 do
-    case_one(num) |> String.replace(dup(table[10], 4), table[10] <> table[50])
-  end
-
+  defp to_roman(num) when num <= 49, do: case_one(num)
   defp to_roman(num) when num <= 89, do: case_two(num, 1)
-
   defp to_roman(num) when num <= 99, do: case_three(num, 1)
 
-  defp to_roman(num) when num <= 499 do
-    case_one(num) |> String.replace(dup(table[100], 4), table[100] <> table[500])
-  end
-
+  defp to_roman(num) when num <= 499, do: case_one(num)
   defp to_roman(num) when num <= 899, do: case_two(num, 2)
-
   defp to_roman(num) when num <= 999, do: case_three(num, 2)
 
   defp to_roman(num) when num <= 4999, do: case_one(num)
