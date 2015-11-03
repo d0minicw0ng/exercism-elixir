@@ -44,50 +44,47 @@ defmodule Roman do
   end
 
   defp table do
-    %{ 10 => "X", 100 => "C", 1000 => "M" }
+    %{
+      1    => "I",
+      5    => "V",
+      10   => "X",
+      50   => "L",
+      100  => "C",
+      500  => "D",
+      1000 => "M"
+    }
   end
 
-  # 1 => "I"
-  # 5 => "V"
-  # 10 => "X"
-  # 50 => "L"
-  # 100 => "C"
-  # 500 => "D"
-  # 1000 => "M"
+  defp to_roman(num) when num <= 3, do: String.duplicate(table[1], num)
 
-  defp to_roman(num) when num <= 3, do: String.duplicate("I", num)
+  defp to_roman(num) when num == 4, do: table[1] <> table[5]
 
-  defp to_roman(num) when num == 4, do: "IV"
+  defp to_roman(num) when num <= 8, do: table[5] <> to_roman(num - 5)
 
-  defp to_roman(num) when num <= 8, do: "V" <> to_roman(num - 5)
-
-  defp to_roman(num) when num == 9, do: "IX"
+  defp to_roman(num) when num == 9, do: table[1] <> table[10]
 
   defp to_roman(num) when num <= 49 do
-    special_case(num) |>
-    String.replace("XXXX", "XL")
+    special_case(num) |> String.replace("XXXX", table[10] <> table[50])
   end
 
   defp to_roman(num) when num <= 89 do
-    "L" <> to_roman(num - 50)
+    table[50] <> to_roman(num - 50)
   end
 
   defp to_roman(num) when num <= 99 do
-    "XC" <> to_roman(num - 90)
+    table[10] <> table[100] <> to_roman(num - 90)
   end
 
   defp to_roman(num) when num <= 499 do
-    special_case(num) |>
-    String.replace("CCCC", "CD")
-
+    special_case(num) |> String.replace("CCCC", table[100] <> table[500])
   end
 
   defp to_roman(num) when num <= 899 do
-    "D" <> to_roman(rem(num, 100))
+    table[500] <> to_roman(rem(num, 100))
   end
 
   defp to_roman(num) when num <= 999 do
-    "CM" <> to_roman(num - 900)
+    table[100] <> table[1000] <> to_roman(num - 900)
   end
 
   defp to_roman(num) when num <= 4999 do
