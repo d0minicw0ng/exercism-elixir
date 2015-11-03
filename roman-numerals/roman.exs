@@ -22,15 +22,28 @@ defmodule Roman do
   end
 
   defp get_roman_representation({num, idx}, arr_length) do
-    (arr_length - idx - 1) |> pow(num) |> round |> to_roman
+    (arr_length - idx - 1) |> times_ten_to_the_power(num) |> round |> to_roman
   end
 
-  defp pow(exponent, num) when exponent == 0 do
-    num
+  defp times_ten_to_the_power(exponent, num) when exponent == 0, do: num
+
+  defp times_ten_to_the_power(exponent, num) do
+    num * ten_to_the_power(exponent)
   end
 
-  defp pow(exponent, num) do
-    num * :math.pow(10, exponent)
+  defp ten_to_the_power(exponent), do: :math.pow(10, exponent)
+
+  defp after_divided_by_divisor_is_between_one_and_four(num) do
+    divisor = get_divisor(num)
+    String.duplicate(table[divisor], div(num, divisor)) <> to_roman(rem(num, divisor))
+  end
+
+  defp get_divisor(num) do
+    :math.log10(num) |> Float.floor |> ten_to_the_power |> round
+  end
+
+  defp table do
+    %{ 10 => "X", 100 => "C", 1000 => "M" }
   end
 
   # 1 => "I"
@@ -41,49 +54,47 @@ defmodule Roman do
   # 500 => "D"
   # 1000 => "M"
 
-  defp to_roman(num) when num == 0, do: ""
-
-  defp to_roman(num) when num >= 1 and num <= 3, do: String.duplicate("I", num)
+  defp to_roman(num) when num <= 3, do: String.duplicate("I", num)
 
   defp to_roman(num) when num == 4, do: "IV"
 
-  defp to_roman(num) when num >= 5 and num <= 8, do: "V" <> to_roman(num - 5)
+  defp to_roman(num) when num <= 8, do: "V" <> to_roman(num - 5)
 
   defp to_roman(num) when num == 9, do: "IX"
 
-  defp to_roman(num) when num >= 10 and num <= 39 do
-    String.duplicate("X", div(num, 10)) <> to_roman(rem(num, 10))
+  defp to_roman(num) when num <= 39 do
+    after_divided_by_divisor_is_between_one_and_four(num)
   end
 
-  defp to_roman(num) when num >= 40 and num <= 49 do
+  defp to_roman(num) when num <= 49 do
     "XL" <> to_roman(rem(num, 10))
   end
 
-  defp to_roman(num) when num >= 50 and num <= 89 do
+  defp to_roman(num) when num <= 89 do
     "L" <> to_roman(num - 50)
   end
 
-  defp to_roman(num) when num >= 90 and num <= 99 do
+  defp to_roman(num) when num <= 99 do
     "XC" <> to_roman(num - 90)
   end
 
-  defp to_roman(num) when num >= 100 and num <= 399 do
-    String.duplicate("C", div(num, 100)) <> to_roman(rem(num, 100))
+  defp to_roman(num) when num <= 399 do
+    after_divided_by_divisor_is_between_one_and_four(num)
   end
 
-  defp to_roman(num) when num >= 400 and num <= 499 do
+  defp to_roman(num) when num <= 499 do
     "CD" <> to_roman(rem(num, 100))
   end
 
-  defp to_roman(num) when num >= 500 and num <= 899 do
+  defp to_roman(num) when num <= 899 do
     "D" <> to_roman(rem(num, 100))
   end
 
-  defp to_roman(num) when num >= 900 and num <= 999 do
+  defp to_roman(num) when num <= 999 do
     "CM" <> to_roman(num - 900)
   end
 
-  defp to_roman(num) when num >= 1000 and num <= 3999 do
-    String.duplicate("M", div(num, 1000)) <> to_roman(rem(num, 1000))
+  defp to_roman(num) when num <= 3999 do
+    after_divided_by_divisor_is_between_one_and_four(num)
   end
 end
