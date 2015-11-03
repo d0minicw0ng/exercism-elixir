@@ -26,10 +26,7 @@ defmodule Roman do
   end
 
   defp times_ten_to_the_power(exponent, num) when exponent == 0, do: num
-
-  defp times_ten_to_the_power(exponent, num) do
-    num * ten_to_the_power(exponent)
-  end
+  defp times_ten_to_the_power(exponent, num), do: num * ten_to_the_power(exponent)
 
   defp ten_to_the_power(exponent), do: :math.pow(10, exponent) |> round
 
@@ -45,13 +42,13 @@ defmodule Roman do
   end
 
 
-  defp case_two(num, exponent) do
-    base = 5 * ten_to_the_power(exponent)
+  defp case_two(num) do
+    base = 5 * get_divisor(num)
     table[base] <> to_roman(rem(num, base))
   end
 
-  defp case_three(num, exponent) do
-    base = ten_to_the_power(exponent)
+  defp case_three(num) do
+    base = get_divisor(num)
     table[base] <> table[base * 10] <> to_roman(num - base * 9)
   end
 
@@ -80,12 +77,12 @@ defmodule Roman do
   defp to_roman(num) when num == 9, do: table[1] <> table[10]
 
   defp to_roman(num) when num <= 49, do: case_one(num)
-  defp to_roman(num) when num <= 89, do: case_two(num, 1)
-  defp to_roman(num) when num <= 99, do: case_three(num, 1)
+  defp to_roman(num) when num <= 89, do: case_two(num)
+  defp to_roman(num) when num <= 99, do: case_three(num)
 
   defp to_roman(num) when num <= 499, do: case_one(num)
-  defp to_roman(num) when num <= 899, do: case_two(num, 2)
-  defp to_roman(num) when num <= 999, do: case_three(num, 2)
+  defp to_roman(num) when num <= 899, do: case_two(num)
+  defp to_roman(num) when num <= 999, do: case_three(num)
 
   defp to_roman(num) when num <= 4999, do: case_one(num)
 end
