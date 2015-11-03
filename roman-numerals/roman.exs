@@ -33,7 +33,8 @@ defmodule Roman do
 
   defp ten_to_the_power(exponent), do: :math.pow(10, exponent)
 
-  defp after_divided_by_divisor_is_between_one_and_four(num) do
+  # TODO: not sure what to name it yet
+  defp special_case(num) do
     divisor = get_divisor(num)
     String.duplicate(table[divisor], div(num, divisor)) <> to_roman(rem(num, divisor))
   end
@@ -62,12 +63,9 @@ defmodule Roman do
 
   defp to_roman(num) when num == 9, do: "IX"
 
-  defp to_roman(num) when num <= 39 do
-    after_divided_by_divisor_is_between_one_and_four(num)
-  end
-
   defp to_roman(num) when num <= 49 do
-    "XL" <> to_roman(rem(num, 10))
+    special_case(num) |>
+    String.replace("XXXX", "XL")
   end
 
   defp to_roman(num) when num <= 89 do
@@ -78,12 +76,10 @@ defmodule Roman do
     "XC" <> to_roman(num - 90)
   end
 
-  defp to_roman(num) when num <= 399 do
-    after_divided_by_divisor_is_between_one_and_four(num)
-  end
-
   defp to_roman(num) when num <= 499 do
-    "CD" <> to_roman(rem(num, 100))
+    special_case(num) |>
+    String.replace("CCCC", "CD")
+
   end
 
   defp to_roman(num) when num <= 899 do
@@ -94,7 +90,7 @@ defmodule Roman do
     "CM" <> to_roman(num - 900)
   end
 
-  defp to_roman(num) when num <= 3999 do
-    after_divided_by_divisor_is_between_one_and_four(num)
+  defp to_roman(num) when num <= 4999 do
+    special_case(num)
   end
 end
