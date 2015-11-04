@@ -1,87 +1,30 @@
 defmodule Roman do
+  @numerals [
+    { 1000, "M"  },
+    { 900,  "CM" },
+    { 500,  "D"  },
+    { 400,  "CD" },
+    { 100,  "C"  },
+    { 90,   "XC" },
+    { 50,   "L"  },
+    { 40,   "XL" },
+    { 10,   "X"  },
+    { 9,    "IX" },
+    { 5,    "V"  },
+    { 4,    "IV" },
+    { 1,    "I"  }
+  ]
+
   @doc """
   Convert the number to a roman number.
   """
   @spec numerals(pos_integer) :: String.t
   def numerals(number) do
-    Integer.to_string(number) |> split |> get_roman_numerals
+    numerals(number, @numerals)
   end
 
-  defp split(str) do
-    String.split(str, "") |>
-    Stream.filter(&(Regex.match?(~r/\d+/, &1))) |>
-    Enum.map(&String.to_integer/1)
+  defp numerals(_, []), do: ""
+  defp numerals(number, [{arabic, roman}|rest]) do
+    String.duplicate(roman, div(number, arabic)) <> numerals(rem(number, arabic), rest)
   end
-
-  defp get_roman_numerals(num_arr) do
-    arr_length = length(num_arr)
-    Enum.with_index(num_arr) |>
-    Enum.reduce("", fn(num_idx, acc) ->
-      acc <> get_roman_representation(num_idx, arr_length)
-    end)
-  end
-
-  defp get_roman_representation({num, idx}, arr_length) do
-    (arr_length - idx - 1) |> times_ten_to_the_power(num) |> to_roman
-  end
-
-  defp times_ten_to_the_power(exponent, num) when exponent == 0, do: num
-  defp times_ten_to_the_power(exponent, num), do: num * ten_to_the_power(exponent)
-
-  defp ten_to_the_power(exponent), do: :math.pow(10, exponent) |> round
-
-  # TODO: not sure what to name the three cases yet...
-  defp case_one(num) do
-    base = get_base(num)
-    String.duplicate(table[base], div(num, base)) <> to_roman(rem(num, base)) |>
-    replace_four_occurrences(base)
-  end
-
-  defp replace_four_occurrences(str, base) do
-    String.replace(str, dup(table[base], 4), table[base] <> table[base * 5])
-  end
-
-  defp case_two(num) do
-    base = 5 * get_base(num)
-    table[base] <> to_roman(rem(num, base))
-  end
-
-  defp case_three(num) do
-    base = get_base(num)
-    table[base] <> table[base * 10] <> to_roman(rem(num, base * 9))
-  end
-
-  defp get_base(num) do
-    :math.log10(num) |> Float.floor |> ten_to_the_power |> round
-  end
-
-  defp table do
-    %{
-      1    => "I",
-      5    => "V",
-      10   => "X",
-      50   => "L",
-      100  => "C",
-      500  => "D",
-      1000 => "M",
-      5000 => "V"
-    }
-  end
-
-  defp dup(char, num), do: String.duplicate(char, num)
-
-  defp to_roman(num) when num <= 3, do: dup(table[1], num)
-  defp to_roman(num) when num == 4, do: table[1] <> table[5]
-  defp to_roman(num) when num <= 8, do: table[5] <> to_roman(num - 5)
-  defp to_roman(num) when num == 9, do: table[1] <> table[10]
-
-  defp to_roman(num) when num <= 49, do: case_one(num)
-  defp to_roman(num) when num <= 89, do: case_two(num)
-  defp to_roman(num) when num <= 99, do: case_three(num)
-
-  defp to_roman(num) when num <= 499, do: case_one(num)
-  defp to_roman(num) when num <= 899, do: case_two(num)
-  defp to_roman(num) when num <= 999, do: case_three(num)
-
-  defp to_roman(num) when num <= 4999, do: case_one(num)
 end
