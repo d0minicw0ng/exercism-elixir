@@ -27,13 +27,11 @@ defmodule DNA do
   """
   @spec nucleotide_counts([char]) :: Dict.t
   def nucleotide_counts(strand) do
-    initial_map |> nucleotide_counts(strand)
+    nucleotides_table |> nucleotide_counts(strand)
   end
 
-  defp initial_map do
-    Enum.reduce(@nucleotides, %{}, fn (char, acc) ->
-      Map.put_new(acc, char, 0)
-    end)
+  defp nucleotides_table do
+    %{?A => 0, ?C => 0, ?G => 0, ?T => 0}
   end
 
   defp nucleotide_counts(map, strand) do
